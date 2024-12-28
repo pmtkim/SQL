@@ -1,0 +1,125 @@
+# In this project, I'm querying a database with multiple tables. It represents a digital media store and includes tables for artists, albums, media tracks, invoices, and customers
+
+-- 1. Show Customers (their full names, customer ID, and country) who are not in the US
+SELECT *
+FROM chinook.customers
+WHERE country <> 'USA';
+
+-- 2. Show only the Customers from Brazil
+SELECT *
+FROM chinook.customers 
+WHERE country = 'Brazil';
+
+-- 3. Find the Invoices of customers who are from Brazil. The resulting table should show the customer's full name, Invoice ID, Date of the invoice, and billing country
+SELECT customers.FirstName, customers.LastName, invoices.InvoiceId, invoices.InvoiceDate, invoices.BillingCountry
+FROM chinook.customers
+INNER JOIN invoices ON customers.Customerid = invoices.Customerid
+WHERE customers.Country = 'Brazil';
+
+-- 4. Show the Employees who are Sales Agents
+SELECT *
+FROM chinook.employees
+WHERE title = 'Sales Support Agent';
+
+-- 5. Find a unique/distinct list of billing countries from the Invoice table
+SELECT DISTINCT billingcountry 
+FROM chinook.invoices
+WHERE billingcountry like 'C%';
+
+-- 6. Provide a query that shows the invoices associated with each sales agent. The resulting table should include the Sales Agent's full name
+SELECT 
+    CONCAT(employees.FirstName, ' ', employees.LastName) AS Sales_Agent_Name,
+    invoices.InvoiceId
+FROM chinook.customers
+INNER JOIN employees ON employees.Employeeid = customers.Supportrepid
+INNER JOIN invoices ON invoices.Customerid = customers.CustomerId;
+
+-- 7. Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers
+SELECT 
+    CONCAT(c.firstname, ' ', c.lastname) AS Customer_Name, 
+    i.Total AS Invoice_Total, 
+    c.Country, 
+    CONCAT(e.firstname, ' ', e.lastname) AS Sales_Agent_Name
+FROM chinook.customers c
+INNER JOIN employees e ON e.employeeid = c.supportrepid
+INNER JOIN invoices i ON i.customerid = c.customerid;
+
+-- 8. How many Invoices were there in 2009?
+SELECT COUNT(*)
+FROM chinook.invoices
+WHERE invoicedate LIKE '2009%';
+
+-- 9. What are the total sales for 2009?
+SELECT SUM(total) AS Total_Sales
+FROM chinook.invoices
+WHERE invoicedate LIKE '2009%';
+
+-- 10. Write a query that includes the purchased track name with each invoice line ID
+SELECT DISTINCT invoice_items.invoicelineid, tracks.name AS Track_Name
+FROM chinook.invoice_items
+INNER JOIN tracks ON tracks.trackid = invoice_items.trackid;
+
+-- 11. Write a query that includes the purchased track name AND artist name with each invoice line ID
+SELECT DISTINCT invoice_items.invoicelineid, tracks.name AS Track_Name, artists.name AS Artist_Name
+FROM chinook.invoice_items
+INNER JOIN tracks ON tracks.trackid = invoice_items.trackid
+INNER JOIN albums ON albums.albumid = tracks.albumid
+INNER JOIN artists ON artists.artistid = albums.artistid;
+
+-- 12. Provide a query that shows all the Tracks, and include the Album name, Media type, and Genre
+SELECT 
+    tracks.name AS Track_Name, 
+    albums.title AS Album_Name, 
+    media_types.name AS Media_Type, 
+    genres.name AS Genre
+FROM chinook.tracks
+INNER JOIN albums ON albums.albumid = tracks.albumid
+INNER JOIN media_types ON media_types.mediatypeid = tracks.mediatypeid
+INNER JOIN genres ON genres.genreid = tracks.genreid;
+
+-- 13. Show the total sales made by each sales agent
+SELECT 
+    SUM(invoices.total) AS Total_Sales, 
+    CONCAT(employees.firstname, ' ', employees.lastname) AS Sales_Agent_Name
+FROM chinook.invoices
+INNER JOIN customers ON customers.customerid = invoices.CustomerId
+INNER JOIN employees ON employees.employeeid = customers.supportrepid
+GROUP BY employees.firstname, employees.lastname;
+
+-- 14. Which sales agent made the most dollars in sales in 2009?
+SELECT 
+    SUM(invoices.total) AS Total_Sales, 
+    CONCAT(employees.firstname, ' ', employees.lastname) AS Sales_Agent_Name
+FROM chinook.invoices
+INNER JOIN customers ON customers.customerid = invoices.CustomerId
+INNER JOIN employees ON employees.employeeid = customers.supportrepid
+WHERE invoicedate LIKE '2009%'
+GROUP BY employees.firstname, employees.lastname
+ORDER BY Total_Sales DESC
+LIMIT 1;
+
+-- 15. Write a query to find the top 5 customers who have spent the most on music in the year 2009. Show their full name, total spent, and country
+SELECT CONCAT(customers.firstname, ' ', customers.lastname) AS Customer_Name,
+   SUM(invoices.Total) AS Total_Spent,
+    customers.country AS Country
+FROM chinook.customers
+
+INNER JOIN invoices ON invoices.customerid = customers.customerid
+WHERE invoices.invoicedate LIKE '2009%'
+GROUP BY CONCAT(customers.firstname, ' ', customers.lastname), customers.country
+ORDER BY Total_Spent desc
+LIMIT 5;
+
+-- 16. Find the most popular genre in 2009. Show the genre name and the number of tracks sold within that genre
+SELECT genres.name AS Genre,
+    SUM(invoice_items.quantity) AS Total_Tracks_Sold
+FROM genres
+
+INNER JOIN tracks ON tracks.genreid = genres.GenreId
+INNER JOIN invoice_items ON invoice_items.trackid = tracks.TrackId
+INNER JOIN invoices ON invoices.invoiceid = invoice_items.invoiceid
+
+WHERE invoicedate LIKE '2009%'
+GROUP BY genres.name
+ORDER BY Total_Tracks_Sold desc
+LIMIT 1;
