@@ -31,16 +31,7 @@ FROM superstore
 ORDER BY price;
 
 -- statistic of item price (average, minimum, maximum)
-SELECT AVG(price)
-FROM superstore;
-
-SELECT MIN(price)
-FROM superstore;
-
-SELECT MAX(price)
-FROM superstore;
-
-SELECT COUNT(item_name)
+SELECT AVG(price), MIN(price), MAX(price)
 FROM superstore;
 
 -- selects average price from items in category 'Kitchen Supplies'
