@@ -25,7 +25,7 @@ VALUES
     (14, 'Cutlery Set', 'Kitchen Supplies', 34.50, 40, 4.4),
     (15, 'Cozy Throw Blanket', 'Furnishings', 24.99, 100, 4.2);
 
--- orders query by price
+-- orders item by price
 SELECT price, item_name
 FROM superstore
 ORDER BY price;
@@ -38,6 +38,9 @@ SELECT MIN(price)
 FROM superstore;
 
 SELECT MAX(price)
+FROM superstore;
+
+SELECT COUNT(item_name)
 FROM superstore;
 
 -- selects average price from items in category 'Kitchen Supplies'
