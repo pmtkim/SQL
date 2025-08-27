@@ -57,3 +57,9 @@ WHERE item_name = "Air Purifier";
 SELECT average_rating, item_name
 FROM superstore
 WHERE item_name = "Premium Coffee Maker";
+
+-- select items that have an average rating of 4.5 or more and order by what's lowest in stock
+SELECT item_name, stock_quantity
+FROM superstore
+WHERE average_rating > 4.5
+ORDER BY stock_quantity asc;
