@@ -57,6 +57,7 @@ VALUES
     ('Company KK', 'Healthcare', 150.2, 3400, 0, 16, 8, 5.3);
 
 -- Assign companies with either unlimited, acceptable or limited time off and group by industry
+
 SELECT industry,
 CASE WHEN paid_time_off_days >= 20 THEN "unlimited time off"
 WHEN paid_time_off_days >= 15 THEN "acceptable time off"
@@ -66,19 +67,88 @@ GROUP BY industry;
 
 -- Which industries have over 100,000 employees and what is their average number of employees?
 
-SELECT industry, ROUND(AVG(employees),1) AS avg_employees
+SELECT industry
+, ROUND(AVG(employees),1) AS avg_employees
 FROM fortune_companies
 GROUP BY industry
-HAVING avg_employees >= 100000;
+HAVING avg_employees >= 100000
+;
 
 -- Which companies have healthcare benefits AND paid time off >= 20 days?
 
 SELECT company_name
 FROM fortune_companies
 WHERE healthcare_benefits = 1
-AND paid_time_off_days >= 20;
+AND paid_time_off_days >= 20
+;
 
 -- Which company in the technology industry has the most revenue and what is their revenue?
+
 SELECT company_name, MAX(revenue)
 FROM fortune_companies
-WHERE industry = "Technology";
+WHERE industry = 'Technology'
+;
+
+-- Show all companies not in the Retail or Energy industries that have maternity leave > 10 weeks.
+
+SELECT company_name
+, industry
+, maternity_leave_weeks
+FROM fortune_companies
+WHERE industry NOT IN ('Retail', 'Energy')
+AND maternity_leave_weeks > 10
+ORDER BY maternity_leave_weeks asc
+;
+
+-- Determine the total number of employees in companies that offer healthcare benefits. Alias it as total_employees_with_benefits.
+
+SELECT SUM(employees) AS total_employees_with_benefits
+FROM fortune_companies
+WHERE healthcare_benefits = 1
+;
+
+-- Break down the above query by industry.
+
+SELECT industry
+, SUM(employees) AS total_employees_with_benefits
+FROM fortune_companies
+WHERE healthcare_benefits = 1
+GROUP BY industry
+ORDER BY total_employees_with_benefits DESC
+;
+
+-- Categorize companies based on revenue:
+-- High: > $400
+-- Medium: $250–$400
+-- Low: < $250
+-- Show the company name, revenue, and revenue category using a CASE expression.
+
+SELECT company_name
+, revenue
+, CASE WHEN revenue > 400 THEN 'High'
+    WHEN revenue < 250 THEN 'Low'
+    ELSE 'Medium'
+END AS revenue_category
+FROM fortune_companies
+;
+
+-- Find industries where the average employee tenure is above 6 years.
+
+SELECT industry
+, AVG(avg_employee_tenure) AS avg_tenure
+FROM fortune_companies
+GROUP BY industry
+HAVING AVG(avg_employee_tenure) > 6
+;
+
+-- Find companies with healthcare benefits and PTO > 20, categorize them as Generous Benefits or Standard Benefits using a CASE.
+
+SELECT company_name
+, healthcare_benefits
+, paid_time_off_days
+, CASE WHEN healthcare_benefits = 1 AND paid_time_off_days > 20 THEN 'Generous Benefits'
+    ELSE 'Standard Benefits'
+END AS benefits_category
+FROM fortune_companies
+;
+
