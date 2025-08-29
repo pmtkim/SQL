@@ -30,5 +30,38 @@ VALUES
   , (390731, 'Insurance B', 80449, 'Glucose Tolerance Test', 150.00, 52.50, 0.00)
     ;
 
+-- Display the patient ID and create a new column that calculates how much each patient still needs to pay, accounting for multiple bills. Call the new column payment_remaining.
 
+SELECT patient_id 
+, SUM(procedure_bill - payment_received) AS payment_remaining 
+FROM billing
+GROUP BY patient_id
+;
 
+-- Add a line to the previous query so that only patients with more than $150 remaining on their payment are displayed.
+
+SELECT patient_id 
+, SUM(procedure_bill - payment_received) AS payment_remaining 
+FROM billing
+GROUP BY patient_id
+HAVING payment_remaining > 150
+;
+
+-- Display the insurance providers and the number of patient bills covered by each provider for lab tests (lab test procedure codes all begin with “80”). Call the new column lab_bills.
+
+SELECT insurance_provider
+, COUNT(procedure_bill) AS lab_bills
+FROM billing
+WHERE procedure_code LIKE "80%"
+GROUP BY insurance_provider
+;
+
+-- Add a line to the previous query to display only insurance companies that have billed more than 3 lab procedures.
+
+SELECT insurance_provider
+, COUNT(procedure_bill) AS lab_bills
+FROM billing
+WHERE procedure_code LIKE "80%"
+GROUP BY insurance_provider
+HAVING COUNT(procedure_bill) >3
+;
