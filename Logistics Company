@@ -72,3 +72,22 @@ INNER JOIN shipments
 ON customers.customer_id = shipments.customer_id
 WHERE shipments.shipping_method != 'Express'
 ;
+
+-- Show the customer name and the package description for all customers and all shipments.
+
+SELECT customers.customer_name, shipments.package_description
+FROM customers
+FULL JOIN shipments
+ON customers.customer_id = shipments.customer_id
+;
+
+-- Display the shipment id, shipping address, and weight for all shipments weighing 3 or more kilograms. Order the results from heaviest to lightest.
+
+SELECT shipments.shipment_id, customers.shipping_address, shipments.weight_kg
+FROM customers
+RIGHT JOIN
+shipments
+ON customers.customer_id = shipments.customer_id
+WHERE shipments.weight_kg >= 3
+ORDER BY shipments.weight_kg desc
+;
