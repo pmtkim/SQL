@@ -191,7 +191,11 @@ GROUP BY assoc_type
 
 -- Find all VIPs who are staying at the same hotel as someone they provide feedback to.
 
-SELECT provider.first_name, provider.last_name, feedback.first_name, feedback.last_name, hotels.hotel_name
+SELECT provider.first_name
+, provider.last_name
+, feedback.first_name
+, feedback.last_name
+, hotels.hotel_name
 FROM vips provider
 INNER JOIN vips feedback
     ON provider.provides_feedback_to = feedback.member_id
@@ -201,4 +205,17 @@ INNER JOIN reservations r2
     ON feedback.member_id = r2.member_id
 INNER JOIN hotels
     ON r1.hotel = hotels.hotel_id
-WHERE r1.hotel = r2.hotel;
+WHERE r1.hotel = r2.hotel
+;
+
+-- List all events with the number of VIPs attending each, sorted from highest to lowest attendance.
+
+SELECT 
+events.event_name
+, COUNT(vips.member_id) AS num_vips
+FROM events
+LEFT JOIN vips
+    ON vips.event = events.event_id
+GROUP BY events.event_name
+ORDER BY num_vips DESC
+;
