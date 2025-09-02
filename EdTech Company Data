@@ -226,3 +226,13 @@ INNER JOIN Textbooks B
 ON A.TextbookID = B.UpdatedVersion
 ORDER BY textbook;
 
+-- Using the authors table, make a list of all the authors who are reviewing a book. Include the AuthorID, author’s name, and the name of the author being reviewed. Order the results by AuthorID for the reviewer (not the person being reviewed) in ascending order.
+
+SELECT authors.AuthorID
+, authors.Name as Reviewer
+, peers.Name as Being_reviewed
+FROM Authors authors
+INNER JOIN Authors peers
+ON authors.reviewing = peers.authorID
+ORDER BY authors.AuthorID
+;
