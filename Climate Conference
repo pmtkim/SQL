@@ -131,3 +131,74 @@ FROM vips
 INNER JOIN events
 ON vips.event = events.event_id
 ;
+
+-- Show all VIPs and their hotel reservation info (hotel name, welcome/dinner RSVP), including VIPs without reservations.
+
+SELECT vips.first_name
+, vips.last_name
+, hotels.hotel_name
+, reservations.welcome_rsvp
+, reservations.dinner_rsvp
+FROM vips
+LEFT JOIN reservations
+  ON vips.member_id = reservations.member_id
+LEFT JOIN hotels
+  ON reservations.hotel = hotels.hotel_id
+;
+
+-- List VIPs along with the hotel they are staying at and the event they are attending.
+
+SELECT vips.first_name
+, vips.last_name
+, hotels.hotel_name
+, events.event_name
+FROM vips
+LEFT JOIN reservations
+  ON vips.member_id = reservations.member_id
+LEFT JOIN hotels
+  ON reservations.hotel = hotels.hotel_id
+LEFT JOIN events
+  ON vips.event = events.event_id
+;
+
+-- Show pairs of VIPs where one provides feedback to the other. Include their names and associations.
+
+SELECT 
+provider.first_name AS provider_first_name
+, provider.last_name AS provider_last_name
+, provider.association AS provider_association
+, feedback.first_name AS receiver_first_name
+, feedback.last_name AS receiver_last_name
+FROM vips provider
+INNER JOIN vips feedback
+    ON provider.provides_feedback_to = feedback.member_id;
+
+-- List VIPs who have RSVP’d “Yes” to dinner, using a subquery in the WHERE clause. 
+
+SELECT first_name
+, last_name
+FROM vips
+WHERE member_id IN (SELECT member_id FROM reservations WHERE dinner_rsvp = 1)
+;
+
+-- Count the number of VIPs per association type.
+
+SELECT COUNT(member_id) AS vips
+, assoc_type AS association_type
+FROM vips
+GROUP BY assoc_type
+;
+
+-- Find all VIPs who are staying at the same hotel as someone they provide feedback to.
+
+SELECT provider.first_name, provider.last_name, feedback.first_name, feedback.last_name, hotels.hotel_name
+FROM vips provider
+INNER JOIN vips feedback
+    ON provider.provides_feedback_to = feedback.member_id
+INNER JOIN reservations r1
+    ON provider.member_id = r1.member_id
+INNER JOIN reservations r2
+    ON feedback.member_id = r2.member_id
+INNER JOIN hotels
+    ON r1.hotel = hotels.hotel_id
+WHERE r1.hotel = r2.hotel;
