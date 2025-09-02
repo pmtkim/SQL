@@ -205,3 +205,24 @@ INNER JOIN Authors
 ON AuthorTextbookLink.AuthorID = Authors.AuthorID
 
 WHERE Courses.GradeLevel = 12;
+
+-- Using the textbooks table, make a list of all of the textbooks. Include the subject, the current book title, and the out of date book title. Order the results by the current textbook title.
+
+SELECT A.Subject
+, A.Title AS textbook
+, B.Title AS previous_version
+FROM Textbooks A
+LEFT JOIN Textbooks B
+ON A.TextbookID = B.UpdatedVersion
+ORDER BY textbook;
+
+-- Make one change to your above answer to display a list of all the textbooks that have an updated version. Display the same columns (subject, the current book title, and the out of date book title).
+
+SELECT A.Subject
+, A.Title AS textbook
+, B.Title AS previous_version
+FROM Textbooks A
+INNER JOIN Textbooks B
+ON A.TextbookID = B.UpdatedVersion
+ORDER BY textbook;
+
